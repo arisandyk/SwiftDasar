@@ -62,3 +62,61 @@ let http200Status = (statusCode: 200, description: "OK")
 print("http200Status memiliki kode status \(http200Status.statusCode)")
 print("http200Status memiliki pesan error \"\(http200Status.description)\"")
 
+// MARK: - 06. Error Handling
+
+// 1. KITA BUAT DULU DEFINISI ERROR-NYA
+enum SandwichError: Error {
+    case outOfCleanDishes
+    case missingIngredients([String])
+}
+
+// 2. Fungsi-fungsi pendukung biar pas di-print kelihatan hasilnya
+func washDishes() {
+    print("Mencuci piring dulu bosq, piring kotor semua...")
+}
+
+func buyGroceries(_ ingredients: [String]) {
+    print("Waduh bahan kurang. Pergi belanja beli: \(ingredients)")
+}
+
+func eatASandwich() {
+    print("Nyam nyam! Sandwich mantap.")
+}
+
+// 3. Fungsi utama yang punya potensi GAGAL (ditandai dengan 'throws')
+func makeASandwich() throws {
+    print("Mulai membuat sandwich...")
+    
+    // --- TEMPAT EKSPERIMEN BOSQ ---
+    // Coba aktifkan (uncomment) salah satu 'throw' di bawah ini untuk melihat error yang berbeda:
+    
+    // Skenario A: Piring kotor
+    // throw SandwichError.outOfCleanDishes
+    
+    // Skenario B: Bahan kurang
+    throw SandwichError.missingIngredients(["Roti", "Daging", "Saus"])
+    
+    // Skenario C: Kalau sukses (biarkan kedua throw di atas di-comment)
+    print("Sandwich berhasil dibuat!")
+}
+ 
+// 4. Proses Eksekusi (Try-Catch)
+do {
+    // Kita 'coba' jalankan fungsinya
+    try makeASandwich()
+    
+    // Kalau makeASandwich() di atas aman tanpa 'throw', baris ini dieksekusi:
+    eatASandwich()
+    
+} catch SandwichError.outOfCleanDishes {
+    // Kalau ada throw 'outOfCleanDishes', Swift langsung loncat ke sini
+    washDishes()
+    
+} catch SandwichError.missingIngredients(let bahannya) {
+    // Kalau ada throw 'missingIngredients', Swift menangkap data bahannya, lalu dikirim ke fungsi belanja
+    buyGroceries(bahannya)
+    
+} catch {
+    // Ini wajib ditambahkan sebagai 'jaring pengaman' terakhir kalau ada error lain
+    print("Terjadi error yang tidak diketahui.")
+}
